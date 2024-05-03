@@ -1,19 +1,23 @@
 ARG py-version=39
-ARG mailip=10.0.0.10
 
 PKG nginx htop portmaster
-PKG py${php-version}-paperless-ngx
+PKG py${py-version}-paperless-ngx
 
 #CP root /
 CMD mkdir -p /www/certificates 
 CMD mkdir -p /usr/local/etc/git_config/nginx
 CMD mkdir -p /usr/local/etc/git_config/paperless
+CMD mkdir -p /var/db/paperless
 #CMD mkdir -p /usr/local/etc/git_config/django
 
 MOUNT /werzel/certificates www/certificates nullfs ro 0 0
 MOUNT /werzel/server_config/nginx usr/local/etc/git_config/nginx nullfs ro 0 0
 MOUNT /werzel/server_config/paperless usr/local/etc/git_config/paperless nullfs ro 0 0
+MOUNT /werzel/paperless var/db/paperless nullfs rw 0 0
 #MOUNT /werzel/server_config/django usr/local/etc/git_config/django nullfs rw 0 0
+
+# Adjust permissions
+CMD chown -R paperless:paperless /var/db/paperless
 
 # Link Configurations 
 CMD rm -rf /usr/local/etc/nginx/nginx.conf
@@ -21,15 +25,14 @@ CMD rm -rf /usr/local/etc/paperless.conf
 CMD ln -s /usr/local/etc/git_config/nginx/paperless.conf /usr/local/etc/nginx/nginx.conf
 CMD ln -s /usr/local/etc/git_config/paperless/paperless.conf /usr/local/etc/paperless.conf
 
-#Create additional Dirs for TMP / Session
-CMD mkdir -p /www/vhosts
-CMD mkdir -p /www/vhosts/tmp
-CMD mkdir -p /www/vhosts/sessions
-CMD mkdir -p /www/vhosts/upload_tmp
-CMD chown -R www:www /www/vhosts
-
-SYSRC php_fpm_enable=YES
+SYSRC paperless-beat_enable=YES
+SYSRC paperless-consumer enable=YES
+SYSRC paperless-webui enable=YES
+SYSRC paperless-worker enable=YES
 SYSRC nginx_enable=YES
 
-SERVICE php-fpm start
+SERVICE paperless-beat start
+SERVICE paperless-consumer start
+SERVICE paperless-webui start
+SERVICE paperless-worker start
 SERVICE nginx start
