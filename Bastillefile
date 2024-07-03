@@ -17,9 +17,10 @@ MOUNT /werzel/paperless var/db/paperless nullfs rw 0 0
 #MOUNT /werzel/server_config/django usr/local/etc/git_config/django nullfs rw 0 0
 
 # Adjust permissions
+CMD ln -s /root/nltk_data /var/db/paperless/nltkdata
 CMD chown -R paperless:paperless /var/db/paperless
 CMD chmod -R a+w /var/db/paperless/consume/input
-
+    
 # Link Configurations 
 CMD rm -rf /usr/local/etc/nginx/nginx.conf
 CMD rm -rf /usr/local/etc/paperless.conf

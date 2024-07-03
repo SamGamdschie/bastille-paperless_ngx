@@ -16,3 +16,14 @@ service paperless-migrate onestart
 ```
 This service can also be run at every system start if desired.
 Currently, this is not configured in this template.
+
+### Natural Language Tool Kit
+It could be necessary o install the `NLTK` data on your own in a certain directory.
+Use user `paperless`to fullfill Task.
+```sh
+su paperless
+python3.11  -m nltk.downloader stopwords
+python3.11  -m nltk.downloader punkt
+mv /var/db/paperless/nltk_data /var/db/paperless/nltkdata
+/usr/local/bin/paperless document_create_classifier
+```
